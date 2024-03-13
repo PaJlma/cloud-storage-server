@@ -3,6 +3,8 @@ export interface IConfig {
   mongoUri: string;
   accessSecret: string;
   refreshSecret: string;
+  accessExpiration: string;
+  refreshExpiration: string;
 }
 
 export interface GetConfigReturns {

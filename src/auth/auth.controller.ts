@@ -2,8 +2,8 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
-  Param,
   Post,
   Req,
   Res,
@@ -41,6 +41,17 @@ export class AuthController {
     return { access };
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post("logout")
+  async logout(@Res({ passthrough: true }) response: Response): Promise<void> {
+    response.cookie("refresh", "");
+  }
+
+  @Delete("delete")
+  async delete(@Body() dto: LoginUserDto): Promise<void> {
+    await this.authService.delete(dto);
+  }
+
   @Get("refresh")
   async refresh(
     @Res({ passthrough: true }) response: Response,
@@ -56,10 +67,8 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get("profile/:userId")
-  async getProfile(
-    @Param("userId") userId: string,
-  ): Promise<Omit<User, "password">> {
-    return this.authService.getProfile(userId);
+  @Get("profile/")
+  async getProfile(@Req() request: Request): Promise<Omit<User, "password">> {
+    return this.authService.getProfile(request["user"]["_id"]);
   }
 }

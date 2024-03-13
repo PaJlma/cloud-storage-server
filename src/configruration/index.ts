@@ -6,6 +6,8 @@ const getConfig: GetConfig = () => ({
     mongoUri: process.env.MONGO_URI,
     accessSecret: process.env.ACCESS_SECRET,
     refreshSecret: process.env.REFRESH_SECRET,
+    accessExpiration: process.env.ACCESS_EXPIRATION,
+    refreshExpiration: process.env.REFRESH_EXPIRATION,
   },
 });
 
