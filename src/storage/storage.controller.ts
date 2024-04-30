@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -15,6 +16,7 @@ import { IEntity, IStorageInfo } from "src/types/storage.types";
 import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { Response } from "express";
+import * as _path from "path";
 
 @Controller("storage")
 export class StorageController {
@@ -55,6 +57,31 @@ export class StorageController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<void> {
     return this.storageService.uploadEntities(userId, path, file);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(":userId/mkdir")
+  async createFolder(
+    @Param("userId") userId: string,
+    @Query("path") path = "/",
+    @Body() { name }: { name: string },
+  ): Promise<void> {
+    return this.storageService.createFolder(userId, path, name);
+  }
+
+  @Get(":userId/download")
+  async download(
+    @Param("userId") userId: string,
+    @Query("path") path = "/",
+    @Res() response: Response,
+  ) {
+    response.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${path.slice(path.lastIndexOf("/"))}"`,
+    );
+    response.sendFile(
+      _path.join(__dirname, "..", "..", "storage", userId, path),
+    );
   }
 
   @UseGuards(JwtAuthGuard)

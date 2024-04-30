@@ -5,6 +5,7 @@ import { Model } from "mongoose";
 import ValidationException from "src/classes/ValidationException";
 import { AVATAR_COLORS } from "src/constants/users";
 import CreateUserDto from "src/dtos/users/createUser.dto";
+import UpdateUserDto from "src/dtos/users/updateUser.dto";
 import { User } from "src/schemas/user.schema";
 
 @Injectable()
@@ -31,6 +32,13 @@ export class UsersService {
       throw new BadRequestException("Пользователя с таким id не существует");
     }
     return this.userModel.findByIdAndDelete(userId);
+  }
+
+  async editAccount(userId: string, dto: UpdateUserDto): Promise<void> {
+    if (!(await this.getById(userId))) {
+      throw new BadRequestException("Пользователя с таким id не существует");
+    }
+    await this.userModel.findByIdAndUpdate(userId, dto);
   }
 
   async getByEmail(email: string): Promise<User> {

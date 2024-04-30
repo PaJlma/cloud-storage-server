@@ -6,6 +6,7 @@ import {
 import * as _path from "path";
 import * as fse from "fs-extra";
 import * as storageScripts from "src/scripts/storage";
+import { Blob } from "buffer";
 import { IEntity, IStorageInfo } from "src/types/storage.types";
 import {
   READABLE_FORMATS,
@@ -123,6 +124,43 @@ export class StorageService {
     } catch {
       throw new InternalServerErrorException(
         "Произошла ошибка при добавлении файлов в хранилище",
+      );
+    }
+  }
+
+  async createFolder(
+    userId: string,
+    path: string,
+    name: string,
+  ): Promise<void> {
+    const dirPath = _path.resolve(`storage/${userId}${path}`);
+    if (!(await fse.pathExists(dirPath))) {
+      throw new BadRequestException(
+        `Директории по данному пути ${path} не существует`,
+      );
+    }
+    try {
+      await fse.mkdir(_path.join(dirPath, name));
+    } catch {
+      throw new InternalServerErrorException(
+        "Произошла ошибка при создании папки",
+      );
+    }
+  }
+
+  async download(userId: string, path: string): Promise<ArrayBuffer> {
+    const entityPath = _path.resolve(`storage/${userId}${path}`);
+    if (!(await fse.pathExists(entityPath)) || path === "/") {
+      throw new BadRequestException(
+        `Сущности по данному пути ${path} не существует`,
+      );
+    }
+    try {
+      const file = await fse.readFile(entityPath);
+      return file;
+    } catch {
+      throw new InternalServerErrorException(
+        "Произошла ошибка при получении файла из хранилища",
       );
     }
   }

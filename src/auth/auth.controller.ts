@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Post,
   Req,
   Res,
@@ -16,6 +17,7 @@ import { AuthService } from "./auth.service";
 import LoginUserDto from "src/dtos/users/loginUser.dto";
 import { User } from "src/schemas/user.schema";
 import { JwtAuthGuard } from "./jwt-auth.guard";
+import UpdateUserDto from "src/dtos/users/updateUser.dto";
 
 @Controller("auth")
 export class AuthController {
@@ -29,6 +31,15 @@ export class AuthController {
     const { access, refresh } = await this.authService.registration(dto);
     response.cookie("refresh", refresh, { httpOnly: true });
     return { access };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch("edit")
+  async editAccount(
+    @Req() request: Request,
+    @Body() dto: UpdateUserDto,
+  ): Promise<void> {
+    await this.authService.updateAccount(request["user"]["_id"], dto);
   }
 
   @Post("login")

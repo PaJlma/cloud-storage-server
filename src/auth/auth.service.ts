@@ -9,6 +9,7 @@ import ValidationException from "src/classes/ValidationException";
 import { IConfig } from "src/configruration/types";
 import CreateUserDto from "src/dtos/users/createUser.dto";
 import LoginUserDto from "src/dtos/users/loginUser.dto";
+import UpdateUserDto from "src/dtos/users/updateUser.dto";
 import { User } from "src/schemas/user.schema";
 import { StorageService } from "src/storage/storage.service";
 import { ITokens } from "src/types/tokens.types";
@@ -53,6 +54,10 @@ export class AuthService {
     } catch {
       throw new UnauthorizedException();
     }
+  }
+
+  async updateAccount(userId: string, dto: UpdateUserDto): Promise<void> {
+    await this.usersService.editAccount(userId, dto);
   }
 
   async getProfile(userId: string): Promise<Omit<User, "password">> {
